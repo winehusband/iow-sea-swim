@@ -12,6 +12,10 @@
     {
       "name": "Channel Coastal Observatory real-time observations",
       "url": "https://coastalmonitoring.org/ccoresources/api/"
+    },
+    {
+      "name": "Environment Agency bathing-water quality data",
+      "url": "https://environment.data.gov.uk/bwq/profiles/"
     }
   ],
   "beaches": [

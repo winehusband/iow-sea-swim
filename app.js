@@ -121,8 +121,10 @@ let tideFetchError = null;
 
 const EDGE_FN_URL = 'https://gsucaxeqzluzbmvonsmj.supabase.co/functions/v1/tide-proxy';
 const WATER_TEMP_FN_URL = 'https://gsucaxeqzluzbmvonsmj.supabase.co/functions/v1/water-temp-proxy';
+const WATER_QUALITY_FN_URL = 'https://gsucaxeqzluzbmvonsmj.supabase.co/functions/v1/water-quality-proxy';
 const CACHE_TTL = 3600000; // 1 hour
 const WATER_TEMP_CACHE_TTL = 30 * 60000;
+const WATER_QUALITY_CACHE_TTL = 30 * 60000;
 const BEACH_CONFIG_URL = 'beaches.json';
 const DEFAULT_BEACH_KEY = 'swim_default_id';
 const ISLAND_BOUNDS = {
@@ -138,8 +140,32 @@ const CCO_SENSOR_BY_BEACH_ID = {
   'whitecliff-bay': 'Sandown Bay',
   'yaverland-east': 'Sandown Bay',
 };
+const EA_BATHING_WATER_BY_BEACH_ID = {
+  'gurnard': { eubwid: 'ukj3400-17700', name: 'Gurnard' },
+  'thorness-bay': { eubwid: 'ukj3400-17700', name: 'Gurnard', nearby: true },
+  'cowes': { eubwid: 'ukj3400-17800', name: 'Cowes' },
+  'east-cowes': { eubwid: 'ukj3400-17850', name: 'East Cowes' },
+  'ryde-west': { eubwid: 'ukj3400-17900', name: 'Ryde', nearby: true },
+  'appley-east': { eubwid: 'ukj3400-17900', name: 'Ryde', nearby: true },
+  'seagrove': { eubwid: 'ukj3400-18000', name: 'Seagrove' },
+  'priory-bay': { eubwid: 'ukj3400-18000', name: 'Seagrove', nearby: true },
+  'bembridge': { eubwid: 'ukj3400-18200', name: 'Bembridge' },
+  'whitecliff-bay': { eubwid: 'ukj3400-18300', name: 'Whitecliff Bay' },
+  'yaverland-east': { eubwid: 'ukj3400-18350', name: 'Yaverland' },
+  'chilton-chine': { eubwid: 'ukj3400-17400', name: 'Compton Bay', nearby: true },
+  'brook-bay': { eubwid: 'ukj3400-17400', name: 'Compton Bay', nearby: true },
+  'atherfield-bay': { eubwid: 'ukj3400-17400', name: 'Compton Bay', nearby: true },
+  'rocken-end': { eubwid: 'ukj3400-18600', name: 'Ventnor', nearby: true },
+  'steephill-cove': { eubwid: 'ukj3400-18600', name: 'Ventnor', nearby: true },
+  'bonchurch': { eubwid: 'ukj3400-18600', name: 'Ventnor', nearby: true },
+  'ventnor': { eubwid: 'ukj3400-18600', name: 'Ventnor' },
+  'freshwater-bay': { eubwid: 'ukj3400-17400', name: 'Compton Bay', nearby: true },
+  'colwell-east': { eubwid: 'ukj3400-17600', name: 'Colwell Bay' },
+  'totland-bay': { eubwid: 'ukj3400-17500', name: 'Totland Bay' },
+};
 
 let waterTempRequestToken = 0;
+let waterQualityRequestToken = 0;
 
 function urlBeachId() {
   const params = new URLSearchParams(window.location.search);
@@ -305,6 +331,7 @@ function applyBeachConfig(beach) {
   renderConfidenceNote();
   updateBeachControls();
   refreshWaterTemperature();
+  refreshWaterQuality();
 }
 
 function tideCacheKey() {
@@ -476,6 +503,149 @@ function refreshWaterTemperature() {
     .catch(() => {
       if (requestToken !== waterTempRequestToken) return;
       setWaterTempError();
+    });
+}
+
+function currentWaterQualitySite() {
+  return EA_BATHING_WATER_BY_BEACH_ID[currentBeach.id] || null;
+}
+
+function waterQualityCacheKey() {
+  const site = currentWaterQualitySite();
+  return `swim_water_quality_cache_${currentBeach.id}_${site ? site.eubwid : 'none'}`;
+}
+
+function setWaterQualityLoading() {
+  const title = document.getElementById('waterQualityTitle');
+  const badge = document.getElementById('waterQualityBadge');
+  const detail = document.getElementById('waterQualityDetail');
+  const meta = document.getElementById('waterQualityMeta');
+  if (title) title.textContent = 'Loading EA water quality...';
+  if (detail) detail.textContent = '';
+  if (meta) meta.textContent = '';
+  if (badge) {
+    badge.textContent = 'EA';
+    badge.className = 'water-quality-badge unknown';
+  }
+}
+
+function setWaterQualityUnavailable(message) {
+  const title = document.getElementById('waterQualityTitle');
+  const badge = document.getElementById('waterQualityBadge');
+  const detail = document.getElementById('waterQualityDetail');
+  const meta = document.getElementById('waterQualityMeta');
+  if (title) title.textContent = 'Water quality unavailable';
+  if (detail) detail.textContent = message || 'Could not load Environment Agency bathing-water data.';
+  if (meta) meta.textContent = 'Check local signs and official notices before swimming.';
+  if (badge) {
+    badge.textContent = 'Check';
+    badge.className = 'water-quality-badge error';
+  }
+}
+
+function formatEaDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function formatMicrobeCount(value, qualifier) {
+  if (typeof value !== 'number') return '';
+  const prefix = (qualifier || '').toLowerCase().includes('less-than') ? '<' : '';
+  return prefix + String(value);
+}
+
+function renderWaterQuality(data) {
+  const site = currentWaterQualitySite();
+  if (!site || !data || data.error) {
+    setWaterQualityUnavailable();
+    return;
+  }
+
+  const status = data.status || {};
+  const level = ['good', 'caution', 'warning', 'unknown'].includes(status.level)
+    ? status.level
+    : 'unknown';
+  const title = document.getElementById('waterQualityTitle');
+  const badge = document.getElementById('waterQualityBadge');
+  const detail = document.getElementById('waterQualityDetail');
+  const meta = document.getElementById('waterQualityMeta');
+
+  if (title) title.textContent = status.label || 'EA bathing-water data';
+  if (detail) detail.textContent = status.message || 'Environment Agency data loaded for this bathing water.';
+  if (badge) {
+    badge.textContent = level === 'good' ? 'EA OK' : level;
+    badge.className = 'water-quality-badge ' + level;
+  }
+
+  if (!meta) return;
+  const officialName = data.bathingWater?.name || site.name;
+  const parts = [
+    site.nearby
+      ? `Nearest EA site: ${officialName}`
+      : `EA site: ${officialName}`,
+  ];
+
+  const classification = data.compliance?.classification;
+  const year = data.compliance?.year;
+  if (classification) {
+    parts.push(`${year || 'Latest'} annual rating: ${classification}`);
+  }
+
+  const sampleDate = formatEaDate(data.sample?.dateTime);
+  const eColi = formatMicrobeCount(data.sample?.eColi, data.sample?.eColiQualifier);
+  const intestinalEnterococci = formatMicrobeCount(
+    data.sample?.intestinalEnterococci,
+    data.sample?.intestinalEnterococciQualifier,
+  );
+  if (sampleDate && (eColi || intestinalEnterococci)) {
+    const counts = [];
+    if (eColi) counts.push(`E. coli ${eColi}`);
+    if (intestinalEnterococci) counts.push(`IE ${intestinalEnterococci}`);
+    parts.push(`Latest sample ${sampleDate}: ${counts.join(', ')}`);
+  } else if (sampleDate) {
+    parts.push(`Latest sample ${sampleDate}`);
+  }
+
+  const forecastDate = formatEaDate(data.risk?.predictedAt || data.updatedAt);
+  if (forecastDate) parts.push(`Forecast checked ${forecastDate}`);
+  if (site.nearby) parts.push('Use as a proxy for this swim spot, not a beach-specific test.');
+
+  meta.textContent = parts.join('. ') + '.';
+}
+
+async function fetchWaterQuality() {
+  const site = currentWaterQualitySite();
+  if (!site) return null;
+
+  try {
+    const cached = JSON.parse(localStorage.getItem(waterQualityCacheKey()) || 'null');
+    if (cached && (Date.now() - cached.ts) < WATER_QUALITY_CACHE_TTL) return cached.data;
+  } catch (e) {}
+
+  const params = new URLSearchParams({ eubwid: site.eubwid });
+  const resp = await fetch(WATER_QUALITY_FN_URL + '?' + params.toString());
+  if (!resp.ok) throw new Error('HTTP ' + resp.status);
+  const data = await resp.json();
+  if (!data || !data.bathingWater) throw new Error('Unexpected response');
+  try {
+    localStorage.setItem(waterQualityCacheKey(), JSON.stringify({ ts: Date.now(), data }));
+  } catch (e) {}
+  return data;
+}
+
+function refreshWaterQuality() {
+  const requestToken = ++waterQualityRequestToken;
+  setWaterQualityLoading();
+  fetchWaterQuality()
+    .then((data) => {
+      if (requestToken !== waterQualityRequestToken) return;
+      renderWaterQuality(data);
+    })
+    .catch(() => {
+      if (requestToken !== waterQualityRequestToken) return;
+      setWaterQualityUnavailable();
     });
 }
 

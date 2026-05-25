@@ -221,6 +221,85 @@
     color: var(--coral);
   }
 
+  /* === WATER QUALITY === */
+  .water-quality-card {
+    padding: 18px 22px;
+    border: 1px solid rgba(46,196,166,0.18);
+    background:
+      linear-gradient(135deg, rgba(231,247,244,0.96), rgba(255,255,255,0.98)),
+      var(--card-bg);
+  }
+
+  .water-quality-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .water-quality-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--text-light);
+    margin-bottom: 5px;
+  }
+
+  .water-quality-title {
+    color: var(--text-dark);
+    font-size: 17px;
+    font-weight: 750;
+    line-height: 1.2;
+  }
+
+  .water-quality-badge {
+    flex: 0 0 auto;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: rgba(46,134,171,0.1);
+    color: var(--ocean-mid);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+  }
+
+  .water-quality-badge.good {
+    background: rgba(72,184,159,0.16);
+    color: var(--seafoam);
+  }
+
+  .water-quality-badge.caution {
+    background: rgba(255,122,26,0.14);
+    color: var(--star-gold);
+  }
+
+  .water-quality-badge.warning,
+  .water-quality-badge.error {
+    background: rgba(232,115,90,0.14);
+    color: var(--coral);
+  }
+
+  .water-quality-badge.unknown {
+    background: rgba(138,154,170,0.14);
+    color: var(--text-light);
+  }
+
+  .water-quality-detail {
+    color: var(--text-mid);
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .water-quality-meta {
+    margin-top: 9px;
+    color: var(--text-light);
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
   /* === TIDE INFO === */
   .tide-info-card {
     padding: 20px 24px;
