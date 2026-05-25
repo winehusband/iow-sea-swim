@@ -89,7 +89,7 @@ const FALLBACK_CONFIG = {
     id: 'gurnard',
     name: 'Gurnard Swim',
     shortName: 'Gurnard',
-    subtitle: 'Sea swim conditions west of the Sailing Club',
+    subtitle: 'Sea swim conditions at Gurnard',
     stationId: '0060',
     stationName: 'Cowes',
     coordinates: { latitude: 50.764, longitude: -1.321 },
@@ -512,7 +512,7 @@ function currentWaterQualitySite() {
 
 function waterQualityCacheKey() {
   const site = currentWaterQualitySite();
-  return `swim_water_quality_cache_${currentBeach.id}_${site ? site.eubwid : 'none'}`;
+  return `swim_water_quality_v2_cache_${currentBeach.id}_${site ? site.eubwid : 'none'}`;
 }
 
 function setWaterQualityLoading() {
@@ -575,7 +575,7 @@ function renderWaterQuality(data) {
   if (title) title.textContent = status.label || 'EA bathing-water data';
   if (detail) detail.textContent = status.message || 'Environment Agency data loaded for this bathing water.';
   if (badge) {
-    badge.textContent = level === 'good' ? 'EA OK' : level;
+    badge.textContent = level === 'good' ? 'No warning' : level;
     badge.className = 'water-quality-badge ' + level;
   }
 

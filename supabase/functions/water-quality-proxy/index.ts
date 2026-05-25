@@ -167,7 +167,6 @@ function parseRisk(riskTopic: Record<string, unknown> | null) {
 function classifyStatus(
   risk: ReturnType<typeof parseRisk>,
   compliance: ReturnType<typeof parseClassification>,
-  impactedByHeavyRain: boolean,
 ) {
   const classification = (compliance?.classification || '').toLowerCase();
 
@@ -189,20 +188,16 @@ function classifyStatus(
 
   if (risk?.level) {
     return {
-      level: impactedByHeavyRain ? 'caution' : 'good',
-      label: 'No current EA warning found',
-      message: impactedByHeavyRain
-        ? 'EA short-term pollution forecast has no warning, but this beach can be affected by heavy rain.'
-        : 'EA short-term pollution forecast has no warning for this bathing water.',
+      level: 'good',
+      label: 'No current EA warning',
+      message: 'EA short-term pollution forecast has no warning for this bathing water.',
     };
   }
 
   return {
     level: 'unknown',
     label: 'No live EA forecast',
-    message: impactedByHeavyRain
-      ? 'No current EA short-term forecast was available. Water quality here can be affected by heavy rain.'
-      : 'No current EA short-term forecast was available for this bathing water.',
+    message: 'No current EA short-term forecast was available for this bathing water.',
   };
 }
 
@@ -255,7 +250,7 @@ Deno.serve(async (req: Request) => {
   const sample = parseSample(sampleJson?.result?.primaryTopic || null);
   const risk = parseRisk(riskJson?.result?.primaryTopic || null);
   const impactedByHeavyRain = profile.waterQualityImpactedByHeavyRain === true;
-  const status = classifyStatus(risk, compliance, impactedByHeavyRain);
+  const status = classifyStatus(risk, compliance);
 
   return cacheResponse(cacheKey, {
     source: {
