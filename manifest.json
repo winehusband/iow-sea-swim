@@ -1,0 +1,25 @@
+{
+  "name": "Isle of Wight Sea Swim",
+  "short_name": "Sea Swim",
+  "description": "Tide and water-temperature windows for Isle of Wight sea swims",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08273a",
+  "theme_color": "#08273a",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

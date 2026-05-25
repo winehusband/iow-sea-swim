@@ -1,0 +1,486 @@
+{
+  "defaultBeachId": "gurnard",
+  "sources": [
+    {
+      "name": "UKHO Admiralty tidal station coverage",
+      "url": "https://developer.admiralty.co.uk/docs/startup"
+    },
+    {
+      "name": "Open-Meteo marine and weather forecasts",
+      "url": "https://open-meteo.com/en/docs/marine-weather-api"
+    },
+    {
+      "name": "Channel Coastal Observatory real-time observations",
+      "url": "https://coastalmonitoring.org/ccoresources/api/"
+    }
+  ],
+  "beaches": [
+    {
+      "id": "gurnard",
+      "name": "Gurnard Beach",
+      "shortName": "Gurnard",
+      "subtitle": "West of the Sailing Club towards Gurnard Luck",
+      "area": "North coast",
+      "stationId": "0060",
+      "stationName": "Cowes",
+      "coordinates": {
+        "latitude": 50.764,
+        "longitude": -1.321
+      },
+      "thresholds": {
+        "high": 3.8,
+        "inlet": 2.15,
+        "low": 1.55
+      },
+      "confidence": {
+        "tide": "Live Cowes tide station where available.",
+        "thresholds": "Starter swim-depth estimate from local tide-height calibration."
+      },
+      "copy": {
+        "ratingLabel": "Swim Tide",
+        "nextWalkTitle": "Next Best Swim Tide",
+        "disclaimer": "Not a safety forecast. Check conditions, currents, water quality, and your own ability before swimming."
+      }
+    },
+    {
+      "id": "thorness-bay",
+      "name": "Thorness Bay",
+      "shortName": "Thorness",
+      "subtitle": "Quiet north-west bay between Gurnard and Newtown",
+      "area": "North coast",
+      "stationId": "0060",
+      "stationName": "Cowes",
+      "coordinates": {
+        "latitude": 50.7416,
+        "longitude": -1.3557
+      },
+      "thresholds": {
+        "high": 3.75,
+        "inlet": 2.1,
+        "low": 1.5
+      },
+      "confidence": {
+        "tide": "Live Cowes tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "cowes",
+      "name": "Cowes Beach",
+      "shortName": "Cowes",
+      "subtitle": "Seafront beach around Egypt Point and Princes Green",
+      "area": "North coast",
+      "stationId": "0060",
+      "stationName": "Cowes",
+      "coordinates": {
+        "latitude": 50.766,
+        "longitude": -1.299
+      },
+      "thresholds": {
+        "high": 3.75,
+        "inlet": 2.1,
+        "low": 1.5
+      },
+      "confidence": {
+        "tide": "Live Cowes tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "east-cowes",
+      "name": "East Cowes Beach",
+      "shortName": "East Cowes",
+      "subtitle": "Esplanade beach east of the Medina",
+      "area": "North coast",
+      "stationId": "0060",
+      "stationName": "Cowes",
+      "coordinates": {
+        "latitude": 50.761,
+        "longitude": -1.287
+      },
+      "thresholds": {
+        "high": 3.7,
+        "inlet": 2.05,
+        "low": 1.45
+      },
+      "confidence": {
+        "tide": "Live Cowes tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "ryde-west",
+      "name": "Ryde Beach West",
+      "shortName": "Ryde West",
+      "subtitle": "Swim spot west of Ryde Pier",
+      "area": "North-east coast",
+      "stationId": "0058",
+      "stationName": "Ryde",
+      "coordinates": {
+        "latitude": 50.7347,
+        "longitude": -1.1678
+      },
+      "thresholds": {
+        "high": 4.1,
+        "inlet": 2.6,
+        "low": 1.8
+      },
+      "confidence": {
+        "tide": "Live Ryde tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "appley-east",
+      "name": "Appley East",
+      "shortName": "Appley",
+      "subtitle": "Swim spot east of Appley Tower",
+      "area": "North-east coast",
+      "stationId": "0058",
+      "stationName": "Ryde",
+      "coordinates": {
+        "latitude": 50.7254,
+        "longitude": -1.139
+      },
+      "thresholds": {
+        "high": 4.05,
+        "inlet": 2.55,
+        "low": 1.75
+      },
+      "confidence": {
+        "tide": "Live Ryde tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "seagrove",
+      "name": "Seagrove Beach",
+      "shortName": "Seagrove",
+      "subtitle": "Quiet bay between Seaview and St Helens",
+      "area": "North-east coast",
+      "stationId": "0058",
+      "stationName": "Ryde",
+      "coordinates": {
+        "latitude": 50.7162,
+        "longitude": -1.1044
+      },
+      "thresholds": {
+        "high": 3.55,
+        "inlet": 2.1,
+        "low": 1.4
+      },
+      "confidence": {
+        "tide": "Live Ryde tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "priory-bay",
+      "name": "Priory Bay",
+      "shortName": "Priory Bay",
+      "subtitle": "Secluded beach reached on foot through woodland",
+      "area": "North-east coast",
+      "stationId": "0058",
+      "stationName": "Ryde",
+      "coordinates": {
+        "latitude": 50.7134,
+        "longitude": -1.0983
+      },
+      "thresholds": {
+        "high": 3.45,
+        "inlet": 2,
+        "low": 1.35
+      },
+      "confidence": {
+        "tide": "Live Ryde tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "bembridge",
+      "name": "Bembridge Beach",
+      "shortName": "Bembridge",
+      "subtitle": "Pebbly shoreline with rockpools and harbour views",
+      "area": "East coast",
+      "stationId": "0054",
+      "stationName": "Bembridge Harbour",
+      "coordinates": {
+        "latitude": 50.6895,
+        "longitude": -1.0864
+      },
+      "thresholds": {
+        "high": 3.4,
+        "inlet": 2,
+        "low": 1.35
+      },
+      "confidence": {
+        "tide": "Live Bembridge Harbour tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "whitecliff-bay",
+      "name": "Whitecliff Bay",
+      "shortName": "Whitecliff",
+      "subtitle": "Sheltered curved bay below Culver Down",
+      "area": "East coast",
+      "stationId": "0054",
+      "stationName": "Bembridge Harbour",
+      "coordinates": {
+        "latitude": 50.6676,
+        "longitude": -1.0957
+      },
+      "thresholds": {
+        "high": 3.35,
+        "inlet": 1.95,
+        "low": 1.3
+      },
+      "confidence": {
+        "tide": "Live Bembridge Harbour tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "yaverland-east",
+      "name": "Yaverland East",
+      "shortName": "Yaverland",
+      "subtitle": "Swim spot east of the car park",
+      "area": "East coast",
+      "stationId": "0053",
+      "stationName": "Sandown",
+      "coordinates": {
+        "latitude": 50.663,
+        "longitude": -1.134
+      },
+      "thresholds": {
+        "high": 3.55,
+        "inlet": 2.1,
+        "low": 1.4
+      },
+      "confidence": {
+        "tide": "Live Sandown tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "chilton-chine",
+      "name": "Chilton Chine",
+      "shortName": "Chilton",
+      "subtitle": "Quiet south-west beach reached by paths",
+      "area": "South-west coast",
+      "stationId": "0048",
+      "stationName": "Freshwater",
+      "coordinates": {
+        "latitude": 50.6383,
+        "longitude": -1.395
+      },
+      "thresholds": {
+        "high": 2.95,
+        "inlet": 1.85,
+        "low": 1.2
+      },
+      "confidence": {
+        "tide": "Live Freshwater tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "brook-bay",
+      "name": "Brook Bay",
+      "shortName": "Brook",
+      "subtitle": "Rugged fossil beach west of Compton",
+      "area": "South-west coast",
+      "stationId": "0048",
+      "stationName": "Freshwater",
+      "coordinates": {
+        "latitude": 50.6544,
+        "longitude": -1.4542
+      },
+      "thresholds": {
+        "high": 2.95,
+        "inlet": 1.85,
+        "low": 1.2
+      },
+      "confidence": {
+        "tide": "Live Freshwater tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "atherfield-bay",
+      "name": "Atherfield Bay",
+      "shortName": "Atherfield",
+      "subtitle": "Remote shingle bay below open farmland",
+      "area": "South-west coast",
+      "stationId": "0048",
+      "stationName": "Freshwater",
+      "coordinates": {
+        "latitude": 50.5984,
+        "longitude": -1.4055
+      },
+      "thresholds": {
+        "high": 2.85,
+        "inlet": 1.75,
+        "low": 1.15
+      },
+      "confidence": {
+        "tide": "Live Freshwater tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "rocken-end",
+      "name": "Rocken End",
+      "shortName": "Rocken End",
+      "subtitle": "Wild rocky stretch near St Catherine's Point",
+      "area": "South coast",
+      "stationId": "0051",
+      "stationName": "Ventnor",
+      "coordinates": {
+        "latitude": 50.5806,
+        "longitude": -1.2996
+      },
+      "thresholds": {
+        "high": 2.75,
+        "inlet": 1.7,
+        "low": 1.1
+      },
+      "confidence": {
+        "tide": "Live Ventnor tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "steephill-cove",
+      "name": "Steephill Cove",
+      "shortName": "Steephill",
+      "subtitle": "Small traditional cove west of Ventnor",
+      "area": "South coast",
+      "stationId": "0051",
+      "stationName": "Ventnor",
+      "coordinates": {
+        "latitude": 50.5908,
+        "longitude": -1.2192
+      },
+      "thresholds": {
+        "high": 2.9,
+        "inlet": 1.8,
+        "low": 1.2
+      },
+      "confidence": {
+        "tide": "Live Ventnor tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "bonchurch",
+      "name": "Bonchurch Beach",
+      "shortName": "Bonchurch",
+      "subtitle": "Quiet shingle beach east of Ventnor",
+      "area": "South-east coast",
+      "stationId": "0051",
+      "stationName": "Ventnor",
+      "coordinates": {
+        "latitude": 50.5966,
+        "longitude": -1.1861
+      },
+      "thresholds": {
+        "high": 2.95,
+        "inlet": 1.85,
+        "low": 1.2
+      },
+      "confidence": {
+        "tide": "Live Ventnor tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "ventnor",
+      "name": "Ventnor Beach",
+      "shortName": "Ventnor",
+      "subtitle": "Town beach below Ventnor Esplanade",
+      "area": "South coast",
+      "stationId": "0051",
+      "stationName": "Ventnor",
+      "coordinates": {
+        "latitude": 50.592,
+        "longitude": -1.2071
+      },
+      "thresholds": {
+        "high": 3,
+        "inlet": 1.9,
+        "low": 1.25
+      },
+      "confidence": {
+        "tide": "Live Ventnor tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "freshwater-bay",
+      "name": "Freshwater Bay",
+      "shortName": "Freshwater",
+      "subtitle": "Pebble bay below the cliffs at West Wight",
+      "area": "West Wight",
+      "stationId": "0048",
+      "stationName": "Freshwater",
+      "coordinates": {
+        "latitude": 50.6678,
+        "longitude": -1.5153
+      },
+      "thresholds": {
+        "high": 3,
+        "inlet": 1.85,
+        "low": 1.2
+      },
+      "confidence": {
+        "tide": "Live Freshwater tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "colwell-east",
+      "name": "Colwell Bay East",
+      "shortName": "Colwell",
+      "subtitle": "Swim spot east of the slipway",
+      "area": "West Wight",
+      "stationId": "0046",
+      "stationName": "Totland Bay",
+      "coordinates": {
+        "latitude": 50.6906,
+        "longitude": -1.5445
+      },
+      "thresholds": {
+        "high": 3.2,
+        "inlet": 1.95,
+        "low": 1.25
+      },
+      "confidence": {
+        "tide": "Live Totland Bay tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    },
+    {
+      "id": "totland-bay",
+      "name": "Totland Bay",
+      "shortName": "Totland",
+      "subtitle": "Sheltered west-coast beach with sunset views",
+      "area": "West Wight",
+      "stationId": "0046",
+      "stationName": "Totland Bay",
+      "coordinates": {
+        "latitude": 50.6819,
+        "longitude": -1.5425
+      },
+      "thresholds": {
+        "high": 3.2,
+        "inlet": 1.95,
+        "low": 1.25
+      },
+      "confidence": {
+        "tide": "Live Totland Bay tide station where available.",
+        "thresholds": "Starter swim-depth estimate; verify entry and depth locally."
+      }
+    }
+  ]
+}

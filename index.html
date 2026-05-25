@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.png">
+<meta property="og:title" content="Isle of Wight Sea Swim">
+<meta property="og:description" content="Tide and water-temperature windows for Isle of Wight sea swims">
+<meta property="og:image" content="https://iow-sea-swim.pages.dev/icon.png">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#08273a">
+<link rel="manifest" href="manifest.json">
+<title>Isle of Wight Sea Swim</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <img class="app-mark" src="icon-192.png" alt="" aria-hidden="true">
+  <h1 id="beachTitle">Gurnard Swim</h1>
+  <div class="subtitle" id="beachSubtitle">Sea swim conditions west of the Sailing Club</div>
+</header>
+
+<div class="container">
+  <div class="viewing-label" id="viewingLabel"></div>
+  <div class="data-status" id="dataStatus">Loading live tide data...</div>
+
+  <div class="card beach-picker-card">
+    <div class="beach-picker-head">
+      <h3>Choose Swim Spot</h3>
+      <span class="default-badge" id="defaultBeachBadge"></span>
+    </div>
+    <div class="beach-select-row">
+      <select id="beachSelect" aria-label="Choose Isle of Wight beach"></select>
+      <button class="btn-default" id="btnDefaultBeach" type="button">Set default</button>
+    </div>
+    <div class="beach-map" id="beachMap" aria-label="Isle of Wight beach map"></div>
+    <div class="swim-note" id="swimNote"></div>
+    <div class="confidence-note" id="confidenceNote"></div>
+  </div>
+
+  <div class="card rating-card" id="ratingCard">
+    <div class="rating-label">Swim Tide</div>
+    <div class="stars-display" id="starsDisplay"></div>
+    <div class="rating-number" id="ratingNumber"></div>
+    <div class="rating-verdict" id="ratingVerdict"></div>
+    <div class="rating-desc" id="ratingDesc"></div>
+  </div>
+
+  <div class="card water-temp-card" id="waterTempCard">
+    <div>
+      <div class="water-temp-label">Sea Temperature</div>
+      <div class="water-temp-source" id="waterTempSource">Loading...</div>
+      <div class="water-temp-meta" id="waterTempMeta"></div>
+    </div>
+    <div class="water-temp-display">
+      <span class="water-temp-val" id="waterTempVal">--</span>
+      <span class="water-temp-unit">°C</span>
+      <span class="water-temp-badge" id="waterTempBadge"></span>
+    </div>
+  </div>
+
+  <div class="card next-walk-card" id="nextWalkCard">
+    <h3>Next Best Swim Tide</h3>
+    <div class="next-walk-time" id="nextWalkTime"></div>
+    <div class="next-walk-detail" id="nextWalkDetail"></div>
+    <div class="next-walk-stars" id="nextWalkStars"></div>
+    <div class="walk-window-meta" id="walkWindowMeta"></div>
+    <div class="rain-strip-wrap" id="rainStripWrap">
+      <div class="rain-strip-label">Rain in this window</div>
+      <div class="rain-strip-times" id="rainStripTimes"></div>
+      <div class="rain-strip" id="rainStrip"></div>
+      <div class="rain-best-band" id="rainBestBand"></div>
+      <div class="rain-strip-legend">
+        <span><span class="dot clear"></span>Clear</span>
+        <span><span class="dot light"></span>Light</span>
+        <span><span class="dot rain"></span>Rain</span>
+        <span><span class="dot heavy"></span>Heavy</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card curve-card">
+    <h3>Today's Tide</h3>
+    <div class="tide-curve-container" id="tideCurve"></div>
+  </div>
+
+  <div class="card tide-info-card">
+    <div class="tide-current">
+      <div class="tide-height-display">
+        <span class="tide-height-val" id="tideHeightVal">--</span>
+        <span class="tide-height-unit">metres</span>
+      </div>
+      <div class="tide-state">
+        <span class="tide-state-arrow" id="tideArrow"></span>
+        <span class="tide-state-text" id="tideStateText"></span>
+        <span id="dataBadge" style="display:none;margin-left:6px;font-size:10px;color:#a0aab4;font-style:italic">~ est.</span>
+      </div>
+    </div>
+    <div class="tide-next-events">
+      <div class="next-event">
+        <div class="next-event-label" id="nextLowLabel">Next Low Tide</div>
+        <div class="next-event-time" id="nextLowTime">--:--</div>
+        <div class="next-event-height" id="nextLowHeight"></div>
+        <div class="next-event-countdown" id="nextLowCountdown"></div>
+      </div>
+      <div class="next-event">
+        <div class="next-event-label" id="nextHighLabel">Next High Tide</div>
+        <div class="next-event-time" id="nextHighTime">--:--</div>
+        <div class="next-event-height" id="nextHighHeight"></div>
+        <div class="next-event-countdown" id="nextHighCountdown"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card picker-card">
+    <h3>Check Another Swim Time</h3>
+    <div class="picker-row">
+      <input type="datetime-local" id="dateTimePicker">
+      <button class="btn-check" id="btnCheck">Check</button>
+    </div>
+    <button class="btn-now" id="btnNow">Back to Now</button>
+  </div>
+
+  <div class="disclaimer">
+    <span id="dataDisclaimer">Tidal data from UK Admiralty API where available; harmonic model as fallback.</span><br>
+    <span id="waterTempDisclaimer">Water temp uses a same-coast CCO observation where available; otherwise it is Open-Meteo sea-surface temperature from the nearest sea forecast grid cell, so treat it as an estimate rather than a beach thermometer.</span><br>
+    <span id="safetyDisclaimer">Not a safety forecast. Check wind, waves, currents, water quality, and your own ability before swimming.</span><br>
+    <span class="disclaimer-privacy">Privacy-friendly analytics — no cookies, no tracking.</span><br>
+    <span class="disclaimer-credit">Created for fun by <a href="https://instagram.com/wine.husband" target="_blank" rel="noopener">@wine.husband</a></span>
+  </div>
+</div>
+
+<script src="swim-core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

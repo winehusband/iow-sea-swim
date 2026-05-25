@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#08273a">
+<title>Swim Feedback</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <h1>Swim Feedback</h1>
+  <div class="subtitle" id="feedbackBeachName">Help tune the swim tide ratings</div>
+</header>
+
+<div class="container feedback-page">
+  <div class="card feedback-card">
+    <h2>What to send</h2>
+    <p>
+      The app gets tide times from a nearby tide station. The bit that needs local help is the swim rating:
+      how the tide height feels for getting in, swimming near shore, and getting out.
+    </p>
+    <p>
+      Send the beach, date, time, water feel, and your 0-5 tide rating. A short note or photo helps a lot.
+    </p>
+    <p class="feedback-send-note">
+      Send it back to me in a message. If you have this app, you probably already know where to find me.
+    </p>
+  </div>
+
+  <div class="card feedback-card">
+    <h2>Star guide</h2>
+    <div class="rating-guide">
+      <div><strong>0 stars</strong><span>Too shallow or awkward for a shore swim.</span></div>
+      <div><strong>1-2 stars</strong><span>Swimmable only with a long wade or awkward entry/exit.</span></div>
+      <div><strong>3 stars</strong><span>Usable, but not the best tide for depth or access.</span></div>
+      <div><strong>4 stars</strong><span>Good swim tide with comfortable near-shore depth.</span></div>
+      <div><strong>5 stars</strong><span>Best tide window around high water.</span></div>
+    </div>
+  </div>
+
+  <div class="card feedback-card">
+    <h2>Copy this</h2>
+    <div class="feedback-template" id="feedbackTemplate">
+Beach:
+Date:
+Time:
+Rating, 0-5:
+Was the tide coming in, going out, or not sure:
+How was entry and exit:
+How far did you need to wade:
+How did the water feel:
+Anything awkward or unsafe:
+    </div>
+    <button class="feedback-copy" id="feedbackCopyButton" type="button">Copy template</button>
+  </div>
+
+  <a class="feedback-back" id="feedbackBackLink" href="./">Back to the swim app</a>
+</div>
+
+<script>
+async function initFeedbackPage() {
+  const params = new URLSearchParams(window.location.search);
+  const beachId = params.get('beach') || '';
+  const title = document.getElementById('feedbackBeachName');
+  const template = document.getElementById('feedbackTemplate');
+  const back = document.getElementById('feedbackBackLink');
+  const copy = document.getElementById('feedbackCopyButton');
+
+  let beachName = '';
+  if (beachId) {
+    try {
+      const resp = await fetch('beaches.json', { cache: 'no-store' });
+      if (resp.ok) {
+        const catalog = await resp.json();
+        const beach = Array.isArray(catalog.beaches)
+          ? catalog.beaches.find((item) => item.id === beachId)
+          : null;
+        beachName = beach ? beach.name : '';
+      }
+    } catch (e) {}
+  }
+
+  if (beachName) {
+    title.textContent = 'Help tune ' + beachName;
+    template.textContent = template.textContent.replace('Beach:', 'Beach: ' + beachName);
+    back.href = './?beach=' + encodeURIComponent(beachId);
+  }
+
+  if (copy && navigator.clipboard) {
+    copy.addEventListener('click', async () => {
+      await navigator.clipboard.writeText(template.textContent.trim());
+      copy.textContent = 'Copied';
+      setTimeout(() => { copy.textContent = 'Copy template'; }, 1400);
+    });
+  }
+}
+
+initFeedbackPage();
+</script>
+</body>
+</html>

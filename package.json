@@ -1,0 +1,12 @@
+{
+  "name": "iow-sea-swim",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "test:e2e": "playwright test tests/e2e/beach-picker.spec.js --reporter=list",
+    "check": "node --check app.js && node --check swim-core.js && node --check playwright.config.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}
