@@ -9,6 +9,7 @@ const CCO_BASE = 'https://coastalmonitoring.org/observations/waves/latest.geojso
 const CCO_DEV_API_KEY = '6cefd36d8e12a4dead4cf06d4dbd09c0';
 const CACHE_TTL_MS = 30 * 60 * 1000;
 const MAX_CCO_AGE_MS = 6 * 60 * 60 * 1000;
+const CALIBRATION_VERSION = '2026-05-25-gurnard-v1';
 
 type CacheEntry = {
   expiresAt: number;
@@ -36,7 +37,44 @@ type CcoObservation = {
   } | null;
 };
 
+type LocalCalibrationReading = {
+  time: string;
+  temperatureC: number;
+};
+
+type LocalCalibration = {
+  label: string;
+  timezone: string;
+  readings: LocalCalibrationReading[];
+};
+
+type CalibrationResult = {
+  source: string;
+  correctionC: number;
+  observationCount: number;
+  modelledTemperatureC: number;
+  adjustedTemperatureC: number;
+  latestObservation: LocalCalibrationReading;
+  comparisons: {
+    time: string;
+    observedC: number;
+    modelledC: number;
+    deltaC: number;
+  }[];
+};
+
 const cache = new Map<string, CacheEntry>();
+const LOCAL_CALIBRATIONS_BY_BEACH_ID: Record<string, LocalCalibration> = {
+  gurnard: {
+    label: 'Gurnard local swimmer readings',
+    timezone: 'Europe/London',
+    readings: [
+      { time: '2026-05-23T08:00', temperatureC: 14 },
+      { time: '2026-05-24T08:00', temperatureC: 14 },
+      { time: '2026-05-25T08:00', temperatureC: 15 },
+    ],
+  },
+};
 
 function jsonResponse(body: unknown, init: ResponseInit = {}) {
   return new Response(JSON.stringify(body), {
@@ -106,6 +144,73 @@ async function fetchOpenMeteo(latitude: number, longitude: number): Promise<Mari
   };
 }
 
+async function fetchLocalCalibration(
+  beachId: string,
+  latitude: number,
+  longitude: number,
+  modelled: MarineModel,
+): Promise<CalibrationResult | null> {
+  const calibration = LOCAL_CALIBRATIONS_BY_BEACH_ID[beachId];
+  if (!calibration || calibration.readings.length < 2) return null;
+
+  const dates = calibration.readings.map((reading) => reading.time.slice(0, 10)).sort();
+  const params = new URLSearchParams({
+    latitude: String(latitude),
+    longitude: String(longitude),
+    hourly: 'sea_surface_temperature',
+    start_date: dates[0],
+    end_date: dates[dates.length - 1],
+    timezone: calibration.timezone,
+    cell_selection: 'sea',
+  });
+  const resp = await fetch(`${OPEN_METEO_BASE}?${params.toString()}`);
+  if (!resp.ok) return null;
+
+  const data = await resp.json();
+  const times = Array.isArray(data?.hourly?.time) ? data.hourly.time : [];
+  const temperatures = Array.isArray(data?.hourly?.sea_surface_temperature)
+    ? data.hourly.sea_surface_temperature
+    : [];
+  const modelByTime = new Map<string, number>();
+  times.forEach((time: unknown, index: number) => {
+    if (typeof time !== 'string') return;
+    const temperatureC = parseNumber(temperatures[index]);
+    if (temperatureC !== null) modelByTime.set(time, temperatureC);
+  });
+
+  const comparisons = calibration.readings
+    .map((reading) => {
+      const modelledC = modelByTime.get(reading.time);
+      if (typeof modelledC !== 'number') return null;
+      const deltaC = reading.temperatureC - modelledC;
+      return {
+        time: reading.time,
+        observedC: reading.temperatureC,
+        modelledC,
+        deltaC: Math.round(deltaC * 10) / 10,
+      };
+    })
+    .filter((comparison): comparison is CalibrationResult['comparisons'][number] => comparison !== null);
+
+  if (comparisons.length < 2) return null;
+
+  const averageDelta = comparisons.reduce((sum, comparison) => sum + comparison.deltaC, 0) / comparisons.length;
+  const correctionC = Math.round(averageDelta * 10) / 10;
+  const adjustedTemperatureC = Math.round((modelled.temperatureC + correctionC) * 10) / 10;
+  const latestObservation = [...calibration.readings].sort((a, b) => a.time.localeCompare(b.time)).at(-1);
+  if (!latestObservation) return null;
+
+  return {
+    source: calibration.label,
+    correctionC,
+    observationCount: comparisons.length,
+    modelledTemperatureC: modelled.temperatureC,
+    adjustedTemperatureC,
+    latestObservation,
+    comparisons,
+  };
+}
+
 async function fetchCcoObservation(sensor: string): Promise<CcoObservation | null> {
   const apiKey = Deno.env.get('CCO_API_KEY') || CCO_DEV_API_KEY;
   const referer = Deno.env.get('CCO_REFERER') || 'https://coastalmonitoring.org';
@@ -158,12 +263,13 @@ Deno.serve(async (req: Request) => {
   const latitude = Number(url.searchParams.get('latitude'));
   const longitude = Number(url.searchParams.get('longitude'));
   const ccoSensor = url.searchParams.get('ccoSensor') || '';
+  const beachId = (url.searchParams.get('beachId') || '').trim().toLowerCase();
 
   if (!validCoordinate(latitude, -90, 90) || !validCoordinate(longitude, -180, 180)) {
     return jsonResponse({ error: 'Invalid coordinates' }, { status: 400 });
   }
 
-  const cacheKey = `${latitude.toFixed(4)}:${longitude.toFixed(4)}:${ccoSensor}`;
+  const cacheKey = `${latitude.toFixed(4)}:${longitude.toFixed(4)}:${ccoSensor}:${beachId}:${CALIBRATION_VERSION}`;
   const cached = cache.get(cacheKey);
   if (cached && cached.expiresAt > Date.now()) {
     return new Response(cached.body, {
@@ -181,6 +287,9 @@ Deno.serve(async (req: Request) => {
     fetchOpenMeteo(latitude, longitude).catch(() => null),
     ccoSensor ? fetchCcoObservation(ccoSensor).catch(() => null) : Promise.resolve(null),
   ]);
+  const calibration = !observed && modelled
+    ? await fetchLocalCalibration(beachId, latitude, longitude, modelled).catch(() => null)
+    : null;
 
   if (!modelled && !observed) {
     const body = JSON.stringify({ error: 'Failed to fetch water temperature data' });
@@ -196,15 +305,20 @@ Deno.serve(async (req: Request) => {
     });
   }
 
-  const primary = observed || modelled;
+  const primaryTemperature = observed
+    ? observed.temperatureC
+    : calibration?.adjustedTemperatureC ?? modelled?.temperatureC;
   const body = JSON.stringify({
-    temperatureC: primary?.temperatureC,
-    source: observed ? 'observed' : 'modelled',
+    temperatureC: primaryTemperature,
+    source: observed ? 'observed' : calibration ? 'calibrated' : 'modelled',
     label: observed
       ? `Observed nearby at ${observed.sensor}`
+      : calibration
+        ? 'Local-calibrated sea temperature'
       : 'Modelled sea surface temperature',
     observed,
     modelled,
+    calibration,
   });
   cache.set(cacheKey, { body, status: 200, expiresAt: Date.now() + CACHE_TTL_MS });
 

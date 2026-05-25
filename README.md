@@ -7,3 +7,5 @@ The app reuses the beach catalogue, tide stations, Admiralty tide proxy, and wat
 This is tide guidance, not a safety forecast. Swimmers still need to check wind, waves, currents, water quality, local signage, entry and exit, and their own ability before getting in.
 
 Water quality is based on Environment Agency bathing-water records. Non-designated swim spots use the nearest official bathing-water sampling point and are labelled as proxy data in the app.
+
+Gurnard sea temperature is locally calibrated from supplied 8am swimmer readings on 23-25 May 2026, applied as a bias correction to the Open-Meteo marine model rather than as a direct current observation.

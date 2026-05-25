@@ -392,7 +392,7 @@ function currentCcoSensor() {
 }
 
 function waterTempCacheKey() {
-  return `swim_water_temp_cache_${currentBeach.id}_${currentCcoSensor() || 'open-meteo'}`;
+  return `swim_water_temp_v2_cache_${currentBeach.id}_${currentCcoSensor() || 'open-meteo'}`;
 }
 
 function setWaterTempLoading() {
@@ -439,8 +439,9 @@ function renderWaterTemperature(data) {
   if (source) source.textContent = data.label || 'Sea surface temperature';
   if (badge) {
     const observed = data.source === 'observed';
-    badge.textContent = observed ? 'Observed' : 'Modelled';
-    badge.className = 'water-temp-badge ' + (observed ? 'observed' : 'modelled');
+    const calibrated = data.source === 'calibrated';
+    badge.textContent = observed ? 'Observed' : calibrated ? 'Calibrated' : 'Modelled';
+    badge.className = 'water-temp-badge ' + (observed ? 'observed' : calibrated ? 'calibrated' : 'modelled');
   }
 
   if (!meta) return;
@@ -454,6 +455,21 @@ function renderWaterTemperature(data) {
     meta.textContent = age !== null
       ? `Observed ${age} min ago.${model}`
       : `Observed reading.${model}`;
+    return;
+  }
+
+  if (data.source === 'calibrated' && data.calibration) {
+    const correction = typeof data.calibration.correctionC === 'number'
+      ? (data.calibration.correctionC > 0 ? '+' : '') + data.calibration.correctionC.toFixed(1) + '°C'
+      : '';
+    const count = data.calibration.observationCount || 0;
+    const latest = data.calibration.latestObservation;
+    const latestText = latest && typeof latest.temperatureC === 'number'
+      ? ` Latest local reading: ${latest.temperatureC.toFixed(1)}°C.`
+      : '';
+    meta.textContent = correction
+      ? `Open-Meteo adjusted ${correction} from ${count} local readings.${latestText}`
+      : `Open-Meteo adjusted from ${count} local readings.${latestText}`;
     return;
   }
 
@@ -478,6 +494,7 @@ async function fetchWaterTemperature() {
   const params = new URLSearchParams({
     latitude: String(latitude),
     longitude: String(longitude),
+    beachId: currentBeach.id,
   });
   const ccoSensor = currentCcoSensor();
   if (ccoSensor) params.set('ccoSensor', ccoSensor);

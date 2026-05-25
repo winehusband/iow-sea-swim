@@ -216,6 +216,11 @@
     color: var(--seafoam);
   }
 
+  .water-temp-badge.calibrated {
+    background: rgba(255,122,26,0.14);
+    color: var(--star-gold);
+  }
+
   .water-temp-badge.error {
     background: rgba(232,115,90,0.12);
     color: var(--coral);
